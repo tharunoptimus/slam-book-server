@@ -18,6 +18,43 @@ router.get("/", (_, res) => {
 })
 
 
+async function sendEmail(registerNumber, randomId) {
+	if (registerNumber.length !== 10) return false
+
+	let email = registerNumber + "@student.annauniv.edu"
+	let secretWord = randomNameGenerator(2)
+
+	let frontEndURL = process.env.FRONT_END_URL
+	let serviceID = process.env.EMAILJS_SERVICE_ID
+	let templateID = process.env.EMAILJS_TEMPLATE_ID
+	let publicKey = process.env.EMAILJS_PUBLIC_KEY
+	let privateKey = process.env.EMAILJS_PRIVATE_KEY
+
+	let verifyURL = frontEndURL + "/verify/" + registerNumber + "/" + randomId
+
+	let templateParams = {
+		secretWord,
+		registerNumber,
+		verifyURL,
+		toEmail: email,
+		developerName: "Team Angris",
+	}
+
+	try {
+		let response = await emailjs.send(
+			serviceID,
+			templateID,
+			templateParams,
+			{ publicKey, privateKey }
+		)
+		console.log(response)
+		return true
+	} catch (error) {
+		console.log(error)
+		return false
+	}
+}
+
 function randomNameGenerator(numberOfWords = 1) {
 	if (numberOfWords < 1) return false
 	let randomName = ""
