@@ -21,6 +21,7 @@ const loginAPI = require("./routes/api/login")
 const logoutAPI = require("./routes/api/logout")
 
 app.use("/api/register", cors, registerAPI)
+app.use("/api/user", cors, requireLogin, userAPI)
 app.use("/api/login", cors, loginAPI)
 app.use("/api/logout", cors, logoutAPI)
 
