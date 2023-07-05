@@ -84,6 +84,76 @@ router.post("/", async (req, res) => {
 	}
 })
 
+router.post("/confirm", async (req, res) => {
+	let { username, registerNumber, updateSecret, password } = req.body
+
+	if (!username || !registerNumber || !updateSecret || !password)
+		return res
+			.status(400)
+			.send({ message: "Make sure the entire payload was sent" })
+
+	let registration = await Registration.findOne({ registerNumber })
+	if (!registration)
+		return res
+			.status(400)
+			.send({
+				message: `Invalid Request: Signup for ${registerNumber} first`,
+			})
+
+	if (registration.updateSecret !== updateSecret)
+		return res
+			.status(400)
+			.send({
+				message:
+					"Invalid Request: Update Secret Mismatch. Signup again!",
+			})
+
+	let user = await User.findOne({username}).catch((error) => {
+		console.log(error)
+		payload.errorMessage = "Something went wrong!"
+		return res.status(500).send("Something went wrong!")
+	})
+
+	if (user == null) {
+		// No user found
+		let data = {
+			email: registerNumber + "@student.annauniv.edu",
+			username,
+			registerNumber,
+			profilePic: "https://api.dicebear.com/6.x/open-peeps/svg?backgroundType=gradientLinear,solid&seed=${username}"
+		}
+
+		data.password = await bcrypt.hash(password, 10)
+		User.create(data).then((user) => {
+			console.log(user)
+			return res.status(201).send({ message: "User Created", username: user.username })
+		})
+	} else {
+		// User Found
+
+		// if that user has the same register number, it is bogus. give the new user a chance to change the username
+
+		if(user.registerNumber == registerNumber) {
+			let data = {
+				email: registerNumber + "@student.annauniv.edu",
+				username,
+				registerNumber,
+				profilePic: "https://api.dicebear.com/6.x/open-peeps/svg?backgroundType=gradientLinear,solid&seed=${username}"
+			}
+
+			data.password = await bcrypt.hash(password, 10)
+			User.create(data).then((user) => {
+				console.log(user)
+				return res.status(201).send({ message: "User Created", username: user.username })
+			})
+		} else {
+			// User found with same username
+			return res.status(400).send({ message: "Username already in use!" })
+		}
+
+	}
+})
+
 async function sendEmail(registerNumber, randomId) {
 	if (registerNumber.length !== 10) return false
 
