@@ -2,7 +2,7 @@ const express = require("express")
 const app = express()
 const router = express.Router()
 const { v4: uuidv4 } = require("uuid")
-const User = require("../schemas/UserSchema")
+const User = require("../../schemas/UserSchema")
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())

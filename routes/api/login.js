@@ -3,7 +3,7 @@ const app = express()
 const router = express.Router()
 const { v4: uuidv4 } = require("uuid")
 const bcrypt = require("bcrypt")
-const User = require("../schemas/UserSchema")
+const User = require("../../schemas/UserSchema")
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
