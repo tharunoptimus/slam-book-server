@@ -18,4 +18,16 @@ router.get("/", (_, res) => {
 })
 
 
+function randomNameGenerator(numberOfWords = 1) {
+	if (numberOfWords < 1) return false
+	let randomName = ""
+	for (let i = 0; i < numberOfWords; i++) {
+		randomName += words[Math.floor(Math.random() * words.length)]
+		if (i !== numberOfWords - 1) {
+			randomName += " "
+		}
+	}
+	return randomName
+}
+
 module.exports = router
