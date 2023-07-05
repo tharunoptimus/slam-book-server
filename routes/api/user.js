@@ -46,4 +46,90 @@ router.get("/:searchTerm", async (req, res) => {
 	}
 })
 
+router.post("/:username", async (req, res) => {
+	let { requestedUsername } = req.params
+	let { username } = req.body
+
+	try {
+		if (username === requestedUsername) {
+			let requestedUser = await User.findOne({
+				username: requestedUsername,
+			})
+				.populate({
+					path: "receivedAdjectives",
+					populate: { path: "content" },
+				})
+				.populate({
+					path: [
+						"_id",
+						"registerNumber",
+						"firstName",
+						"lastName",
+						"instagram",
+						"twitter",
+						"facebook",
+						"linkedIn",
+						"website",
+						"about",
+						"emoji",
+						"email",
+						"profilePic",
+					],
+				})
+				.catch((e) => {
+					console.log(e)
+					return res.status(500).send("Internal server error")
+				})
+
+			if (!requestedUser) return res.status(404).send("User not found")
+
+			return res.status(200).json({ user: requestedUser })
+		}
+	} catch (e) {
+		console.log(e)
+		return res.status(500).send("Internal server error")
+	}
+
+	try {
+		let requestedUser = await User.findOne({ username: requestedUsername })
+			.populate({
+				path: "receivedAdjectives",
+				populate: { path: ["givenBy", "receivedBy", "content"] },
+			})
+			.populate({
+				path: [
+					"_id",
+					"registerNumber",
+					"firstName",
+					"lastName",
+					"instagram",
+					"twitter",
+					"facebook",
+					"linkedIn",
+					"website",
+					"about",
+					"emoji",
+					"email",
+					"profilePic",
+				],
+			})
+			.catch((e) => {
+				console.log(e)
+				return res.status(500).send("Internal server error")
+			})
+
+		if (!requestedUser) return res.status(404).send("User not found")
+
+		requestedUser.receivedAdjectives =
+			requestedUser.receivedAdjectives.filter(
+				(adjective) => adjective.givenBy.username === username
+			)
+
+		return res.status(200).json({ user: requestedUser })
+	} catch (error) {
+		console.log(error)
+		return res.status(500).send("Internal server error")
+	}
+})
+
 module.exports = router
