@@ -17,6 +17,40 @@ router.get("/", (_, res) => {
 	res.send({ message: "Registration Endpoint Online" })
 })
 
+router.get("/:registerNumber/:sessionSecret", async (req, res) => {
+	let { registerNumber, sessionSecret } = req.params
+	if (!registerNumber || !sessionSecret)
+		return res
+			.status(400)
+			.send({ message: "Make sure you copy paste the entire URL" })
+
+	let registration = await Registration.findOne({ registerNumber })
+	if (!registration)
+		return res
+			.status(400)
+			.send({
+				message: `Invalid Request: Signup for ${registerNumber} first`,
+			})
+
+	if (registration.sessionSecret !== sessionSecret)
+		return res
+			.status(400)
+			.send({
+				message:
+					"Invalid Request: Session Secret Mismatch. Signup again!",
+			})
+
+	let randomId = uuidv4()
+	console.log(`Update ID generated: ${randomId} for ${registerNumber}`)
+
+	try {
+		await Registration.updateOne(registerNumber, { updateSecret: randomId })
+		res.status(200).send({ updateID: randomId })
+	} catch (error) {
+		console.log(error)
+		res.status(500).send({ message: "Error generating update ID" })
+	}
+})
 
 router.post("/", async (req, res) => {
 	let registerNumber = req.body.registerNumber
