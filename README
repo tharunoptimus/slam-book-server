@@ -15,7 +15,18 @@ The following libraries and frameworks were used in this project:
 
 ## Installation
 
-Before running the project, make sure to set the `MONGODB_URI` environment variable and install the necessary dependencies:
+Before running the project, make sure to set the these environment variables and install the necessary dependencies:
+
+```bash
+MONGODB_URI
+EMAILJS_SERVICE_ID
+EMAILJS_PUBLIC_KEY
+EMAILJS_PRIVATE_KEY
+EMAILJS_TEMPLATE_ID
+FRONT_END_URL
+```
+
+### Install the dependencies by running:
 
 ```bash
 npm install
