@@ -18,6 +18,38 @@ router.get("/", (_, res) => {
 })
 
 
+router.post("/", async (req, res) => {
+	let registerNumber = req.body.registerNumber
+	if (!registerNumber)
+		return res.status(400).send({ message: "Register Number not provided" })
+
+	let registration = await Registration.findOne({ registerNumber })
+	if (registration) {
+		let randomId = uuidv4()
+		console.log(`Random ID generated: ${randomId} for ${registerNumber}`)
+		let status = await sendEmail(registerNumber, randomId)
+		if (status) {
+			await Registration.updateOne(
+				{ registerNumber },
+				{ sessionSecret: randomId }
+			)
+			return res.status(200).send({ message: "Email sent successfully" })
+		} else {
+			return res.status(500).send({ message: "Error sending email" })
+		}
+	}
+
+	let randomId = uuidv4()
+	console.log(`Random ID generated: ${randomId} for ${registerNumber}`)
+	let status = await sendEmail(registerNumber, randomId)
+	if (status) {
+		await Registration.create({ registerNumber, sessionSecret: randomId })
+		return res.status(200).send({ message: "Email sent successfully" })
+	} else {
+		return res.status(500).send({ message: "Error sending email" })
+	}
+})
+
 async function sendEmail(registerNumber, randomId) {
 	if (registerNumber.length !== 10) return false
 
