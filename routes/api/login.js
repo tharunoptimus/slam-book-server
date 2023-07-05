@@ -30,15 +30,36 @@ router.post("/", async (req, res,) => {
 					`Session ID generated: ${randomId} for ${user.username}`
 				)
 
-				await User.updateOne(
+				user = await User.updateOne(
 					{ username: user.username },
-					{ temporaryToken: randomId }
-				).catch((error) => {
+					{ temporaryToken: randomId },
+					{ new: true}
+				)
+				.populate({
+					path: [
+						"_id",
+						"temporaryToken",
+						"registerNumber",
+						"firstName",
+						"lastName",
+						"instagram",
+						"twitter",
+						"facebook",
+						"linkedIn",
+						"website",
+						"about",
+						"emoji",
+						"email",
+						"profilePic",
+						"profilePicBinary"
+					],
+				})
+				.catch((error) => {
 					console.log(error)
 					return res.status(500).send("Something went wrong!")
 				})
 
-				return res.status(200).send({ temporaryToken: randomId })
+				return res.status(200).send({ user })
 			}
 		}
 
