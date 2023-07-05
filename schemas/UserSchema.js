@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const UserSchema = new Schema({
     profilePic: { type: String },
+	profilePicBinary: { type: Buffer },
 	givenAdjectives: [{ type: Schema.Types.ObjectId, ref: "Adjective" }],
 	receivedAdjectives: [{ type: Schema.Types.ObjectId, ref: "Adjective" }],
 	email: { type: String, required: true, trim: true, unique: true },

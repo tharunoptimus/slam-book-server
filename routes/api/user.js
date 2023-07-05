@@ -32,6 +32,7 @@ router.get("/:searchTerm", async (req, res) => {
 					"username",
 					"email",
 					"profilePic",
+					"profilePicBinary",
 				],
 			})
 			.catch((e) => {
@@ -74,6 +75,7 @@ router.post("/:username", async (req, res) => {
 						"emoji",
 						"email",
 						"profilePic",
+						"profilePicBinary",
 					],
 				})
 				.catch((e) => {
@@ -111,6 +113,7 @@ router.post("/:username", async (req, res) => {
 					"emoji",
 					"email",
 					"profilePic",
+					"profilePicBinary",
 				],
 			})
 			.catch((e) => {
@@ -183,6 +186,7 @@ router.put("/:username", async (req, res) => {
 					"emoji",
 					"email",
 					"profilePic",
+					"profilePicBinary",
 				],
 			})
 			.catch((e) => {
@@ -198,5 +202,6 @@ router.put("/:username", async (req, res) => {
 		return res.status(500).send("Internal server error")
 	}
 })
+
 
 module.exports = router
