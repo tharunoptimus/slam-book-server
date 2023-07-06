@@ -1,5 +1,5 @@
 require("express-async-errors")
-const User = require("./schemas/UserSchema")
+const jwt = require('jsonwebtoken')
 
 exports.cors = (req, res, next) => {
 	let origin = req.headers.origin
@@ -19,26 +19,14 @@ exports.cors = (req, res, next) => {
 }
 
 exports.requireLogin = async (req, res, next) => {
-	let { username, temporaryToken } = req.body
 
-	if (!username || !temporaryToken) {
-		return res
-			.status(400)
-			.json({ message: "Make sure to enter all the details (M)" })
+	if (req.headers.authorization) {
+		let token = req.headers.authorization.split(" ")[1]
+		let user = jwt.verify(token, process.env.JWT_SECRET)
+		req.body.username = user.username
+
+		return next()
 	}
 
-	let user = await User.findOne({ username }).catch((error) => {
-		console.log(error)
-		return res.status(500).json({ message: "Something went wrong (M)" })
-	})
-
-	if (!user) {
-		return res.status(404).json({ message: "User not found (M)" })
-	}
-
-	if (user.temporaryToken !== temporaryToken) {
-		return res.status(401).json({ message: "Invalid temporary token (M)" })
-	}
-
-	return next()
+	return res.status(401).json({ message: "Unauthorized (M)" })
 }
