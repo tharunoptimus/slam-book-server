@@ -18,7 +18,6 @@ const UserSchema = new Schema({
 	website: { type: String, trim: true },
 	about: { type: String, trim: true },
 	emoji: { type: String, trim: true },
-	temporaryToken: { type: String, trim: true },
 }, { timestamps: true });
 
 let User = mongoose.model('User', UserSchema)
