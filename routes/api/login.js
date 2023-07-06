@@ -1,63 +1,55 @@
+require("dotenv").config()
 const express = require("express")
 const app = express()
 const router = express.Router()
-const { v4: uuidv4 } = require("uuid")
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 const User = require("../../schemas/UserSchema")
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
-router.get("/", (req, res,) => {
+router.get("/", (req, res) => {
 	res.status(200).render("LOGIN API ONLINE")
 })
 
-router.post("/", async (req, res,) => {
+router.post("/", async (req, res) => {
 	if (req.body.username && req.body.password) {
-		let user = await User.findOne({ username: req.body.username }).catch(
-			(error) => {
+		let user = await User.findOne({ username: req.body.username })
+			.populate({
+				path: [
+					"_id",
+					"registerNumber",
+					"firstName",
+					"lastName",
+					"instagram",
+					"twitter",
+					"facebook",
+					"linkedIn",
+					"website",
+					"about",
+					"emoji",
+					"email",
+					"profilePic",
+					"profilePicBinary",
+				],
+			})
+			.catch((error) => {
 				console.log(error)
 				return res.status(500).send("Something went wrong!")
-			}
-		)
+			})
 
 		if (user != null) {
-			var result = await bcrypt.compare(req.body.password, user.password)
+			let result = await bcrypt.compare(req.body.password, user.password)
 
 			if (result === true) {
-				let randomId = uuidv4()
-				console.log(
-					`Session ID generated: ${randomId} for ${user.username}`
-				)
-
-				user = await User.updateOne(
+				
+				let token = jwt.sign(
 					{ username: user.username },
-					{ temporaryToken: randomId },
-					{ new: true}
+					process.env.JWT_SECRET,
+					{ expiresIn: process.env.JWT_VALIDITY }
 				)
-				.populate({
-					path: [
-						"_id",
-						"temporaryToken",
-						"registerNumber",
-						"firstName",
-						"lastName",
-						"instagram",
-						"twitter",
-						"facebook",
-						"linkedIn",
-						"website",
-						"about",
-						"emoji",
-						"email",
-						"profilePic",
-						"profilePicBinary"
-					],
-				})
-				.catch((error) => {
-					console.log(error)
-					return res.status(500).send("Something went wrong!")
-				})
+				user.temporaryToken = token
 
 				return res.status(200).send({ user })
 			}
