@@ -20,13 +20,11 @@ const registerAPI = require("./routes/api/register")
 const userAPI = require("./routes/api/user")
 const adjectiveAPI = require("./routes/api/adjective")
 const loginAPI = require("./routes/api/login")
-const logoutAPI = require("./routes/api/logout")
 
 app.use("/api/register", cors, registerAPI)
 app.use("/api/user", cors, requireLogin, userAPI)
 app.use("/api/adjective", cors, requireLogin, adjectiveAPI)
 app.use("/api/login", cors, loginAPI)
-app.use("/api/logout", cors, logoutAPI)
 
 app.get("/", (_, res) => {
 	res.status(200).send("SLAM BOOK API ONLINE")
