@@ -27,7 +27,21 @@ EMAILJS_PUBLIC_KEY
 EMAILJS_PRIVATE_KEY
 EMAILJS_TEMPLATE_ID
 FRONT_END_URL
+JWT_SECRET
+JWT_VALIDITY
 ```
+
+Note: For generating a great JWT secret, run this JS code with Node.js:
+
+```javascript
+let crypto = require("crypto")
+let complexity = 40
+console.log(crypto.randomBytes(complexity).toString('hex'))
+```
+
+and copy the output to the JWT_SECRET environment variable.
+
+The JWT_VALIDITY environment variable is the number of seconds that the JWT token is valid for. Eg: 1m, 1h, 1d, 1w, 1y.
 
 ### Install the dependencies by running:
 
